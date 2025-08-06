@@ -264,15 +264,12 @@
         @media (max-width: 850px) {
             .modal-content h1 { font-size: 2.5rem; }
             .modal-body { flex-direction: column; gap: 25px; }
-            /* .image-content { order: -1; margin-bottom: 0; } - Ya no es necesario */
-            /* .image-content img { max-width: 250px; } - Ya no es necesario */
         }
         
         @media (max-width: 480px) {
             .modal-content { padding: 35px 20px 25px 20px; width: 95%; }
             .modal-content h1 { font-size: 2rem; }
             .text-content p { font-size: 1rem; }
-            /* .image-content img { max-width: 200px; } - Ya no es necesario */
 
             .close-button {
                 top: 10px;
@@ -281,6 +278,7 @@
         }
 
         /* --- ESTILOS PARA EL MODAL INTERMEDIO (LA CARTA BLANCA) --- */
+        /* Estos estilos ya no se usarán si el modal intermedio se elimina del HTML */
         #intermediateModalContainer {
             z-index: 11; /* Asegura que esté por encima del modal principal */
         }
@@ -361,17 +359,6 @@
         <h2 id="clickMeText">¡Presiona aquí, Sister!</h2>
     </div>
 
-    <!-- NUEVO: Contenedor de la ventana modal intermedia (la carta blanca con corazón y texto) -->
-    <div id="intermediateModalContainer" class="modal-container">
-        <div class="intermediate-modal-content">
-            <!-- Corazón SVG blanco -->
-            <svg class="white-heart-svg" viewBox="0 0 24 24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-            <p class="to-maylin-text">Para Maylin</p> <!-- Texto "Para Maylin" debajo del corazón -->
-        </div>
-    </div>
-
     <!-- Contenedor de la ventana modal principal con el mensaje de cumpleaños -->
     <div id="modalContainer" class="modal-container">
         <div class="modal-content">
@@ -389,7 +376,6 @@
                     </p>
                     <p class="signature">Con mucho cariño,<br>tu sister preferido Dark 😊</p> <!-- Firma personalizada -->
                 </div>
-                <!-- La sección .image-content ha sido eliminada de aquí -->
             </div>
         </div>
     </div>
@@ -455,8 +441,8 @@
         }
 
         // Elementos de los modales
-        const intermediateModalContainer = document.getElementById('intermediateModalContainer');
-        const intermediateModalContent = document.querySelector('.intermediate-modal-content'); // Contenido para el click
+        // const intermediateModalContainer = document.getElementById('intermediateModalContainer'); // Eliminado
+        // const intermediateModalContent = document.querySelector('.intermediate-modal-content'); // Eliminado
         const modalContainer = document.getElementById('modalContainer');
         const closeButton = document.querySelector('.close-button');
 
@@ -566,21 +552,9 @@
             scene.add(starsMesh); // Añade las estrellas a la escena
 
             // Lógica para abrir y cerrar los modales
-            // Función para abrir el modal intermedio
-            function openIntermediateModal() {
-                if (!intermediateModalContainer.classList.contains('active')) {
-                    intermediateModalContainer.classList.add('active');
-                    if (renderer) renderer.setPixelRatio(window.devicePixelRatio * 0.5); 
-                }
-            }
-
-            // Función para cerrar el modal intermedio
-            function closeIntermediateModal() {
-                intermediateModalContainer.classList.remove('active');
-            }
-
-            // Función para abrir el modal principal
+            // Función para abrir el modal principal directamente
             function openMainModal() {
+                console.log("Abriendo modal principal..."); // Debugging
                 if (!modalContainer.classList.contains('active')) {
                     modalContainer.classList.add('active');
                     if (renderer) renderer.setPixelRatio(window.devicePixelRatio * 0.5); // Asegura que el pixel ratio se ajuste
@@ -588,25 +562,29 @@
             }
             // Función para cerrar el modal principal
             function closeMainModal() {
+                console.log("Cerrando modal principal..."); // Debugging
                 modalContainer.classList.remove('active');
                 if (renderer) renderer.setPixelRatio(window.devicePixelRatio);
             }
 
             // Event listeners para abrir/cerrar los modales
-            clickMeText.addEventListener('click', openIntermediateModal); // El primer clic abre el modal intermedio
-
-            // Al hacer clic en el contenido del modal intermedio, se cierra y se abre el principal
-            intermediateModalContent.addEventListener('click', () => {
-                closeIntermediateModal();
-                openMainModal();
+            clickMeText.addEventListener('click', () => {
+                console.log("Clic en 'Presiona aquí, Sister!'"); // Debugging
+                openMainModal(); // Ahora abre directamente el modal principal
             });
 
-            closeButton.addEventListener('click', closeMainModal); // El botón de cerrar siempre cierra el modal principal
+            closeButton.addEventListener('click', () => {
+                console.log("Clic en el botón de cerrar del modal principal."); // Debugging
+                closeMainModal(); // El botón de cerrar siempre cierra el modal principal
+            });
             modalContainer.addEventListener('click', (e) => { // Cierra el modal principal si se hace clic fuera del contenido
-                if (e.target === modalContainer) closeMainModal();
+                if (e.target === modalContainer) {
+                    console.log("Clic fuera del contenido del modal principal."); // Debugging
+                    closeMainModal();
+                }
             });
 
-            // Raycaster para detectar clics en el corazón 3D (ahora abre el modal intermedio)
+            // Raycaster para detectar clics en el corazón 3D (ahora abre el modal principal directamente)
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             function onHeartClick(event) {
@@ -614,7 +592,10 @@
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObject(heart);
-                if (intersects.length > 0) openIntermediateModal(); // Cambiado para abrir el modal intermedio
+                if (intersects.length > 0) {
+                    console.log("Clic en el corazón 3D."); // Debugging
+                    openMainModal(); // Ahora abre directamente el modal principal
+                }
             }
             window.addEventListener('click', onHeartClick, false);
 
@@ -657,7 +638,7 @@
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 // Ajusta el pixel ratio del renderizador si el modal no está activo
-                if (!modalContainer.classList.contains('active') && !intermediateModalContainer.classList.contains('active')) {
+                if (!modalContainer.classList.contains('active')) { // Solo verificamos el modal principal
                     renderer.setPixelRatio(window.devicePixelRatio);
                 }
             });
